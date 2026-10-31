@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /app/
+Disallow: /manuals/
+
+Sitemap: https://YOUR-USERNAME.github.io/YOUR-REPO/sitemap.xml

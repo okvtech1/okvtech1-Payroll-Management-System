@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin — OKV Nigeria Payroll &amp; HR Management System</title>
+<link rel="icon" href="icons/icon-192.png">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A; --navy2:#122C52; --navy3:#1B3A6B;
+    --gold:#C9A24B; --gold-light:#E7CE8F; --gold-dark:#A9832E;
+    --bg:#F1F4F9; --ink:#1C2530; --muted:#6B7686; --line:#E7EAF1;
+    --good:#1E8E5A; --warn:#C9862B; --bad:#C0392B;
+    --font-display:'Sora',Arial,sans-serif; --font-body:'Inter',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); font-family:var(--font-body); color:var(--ink); margin:0;}
+  #loadingScreen{
+    position:fixed; inset:0; z-index:5000; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,var(--navy) 0%, var(--navy2) 55%, var(--navy3) 100%); transition:opacity .4s;
+  }
+  #loadingScreen.hide{opacity:0; pointer-events:none;}
+  .loading-mark{width:64px; height:64px; border-radius:18px; margin:0 auto 16px; background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:var(--navy); font-family:var(--font-display); font-weight:800; font-size:1.2rem; display:flex; align-items:center; justify-content:center;}
+  .loading-inner{text-align:center; color:#fff;}
+  .loading-title{font-family:var(--font-display); font-weight:700; margin-top:14px;}
+  .loading-sub{color:#c6d1e6; font-size:.85rem; margin-top:4px;}
+  .app-shell{display:flex; min-height:100vh;}
+  #sidebar{
+    width:260px; background:var(--navy); color:#fff; flex-shrink:0; position:fixed; top:0; bottom:0; left:0;
+    overflow-y:auto; z-index:40; transition:transform .25s;
+  }
+  #sidebar .brand{padding:22px 20px 14px; display:flex; align-items:center; gap:10px;}
+  #sidebar .brand .mark{width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:var(--navy); font-family:var(--font-display); font-weight:800; display:flex; align-items:center; justify-content:center;}
+  #sidebar .brand .txt{font-family:var(--font-display); font-weight:700; font-size:.92rem; line-height:1.2;}
+  #sidebar .brand .sub{font-size:.68rem; color:var(--gold-light); letter-spacing:.05em; text-transform:uppercase;}
+  .nav-group-label{font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:#7d8bab; padding:16px 20px 6px;}
+  .sidebar-legal{ padding:20px 20px 24px; font-size:.68rem; color:#7d8bab; }
+  .sidebar-legal a{ color:#7d8bab; text-decoration:none; }
+  .sidebar-legal a:hover{ color:#fff; }
+  .pw-field{ position:relative; }
+  .pw-field input{ padding-right:38px; }
+  .pw-toggle{ position:absolute; right:4px; top:0; height:100%; width:32px; background:none; border:0; color:#6c757d;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+  .pw-toggle:hover{ color:#1C2530; }
+  .side-link{
+    display:flex; align-items:center; gap:10px; padding:10px 20px; color:#c6d1e6; text-decoration:none; font-size:.88rem;
+    cursor:pointer; border-left:3px solid transparent;
+  }
+  .side-link i{width:18px; text-align:center;}
+  .side-link:hover{background:rgba(255,255,255,.06); color:#fff;}
+  .side-link.active{background:rgba(201,162,75,.14); color:#fff; border-left-color:var(--gold);}
+  main{margin-left:260px; flex:1; min-height:100vh; display:flex; flex-direction:column;}
+  #topbar{background:#fff; border-bottom:1px solid var(--line); padding:14px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:30;}
+  .toggle-btn{display:none; background:none; border:0; font-size:1.3rem; color:var(--navy);}
+  .content{padding:22px; flex:1;}
+  .card-panel{background:#fff; border-radius:14px; border:1px solid var(--line); overflow:hidden;}
+  .panel-head{padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  .panel-head h6{margin:0; font-family:var(--font-display); font-weight:700; color:var(--navy); font-size:.92rem;}
+  .panel-body{padding:18px;}
+  .kpi-card{background:#fff; border-radius:14px; border:1px solid var(--line); padding:16px 18px;}
+  .kpi-card .lbl{font-size:.75rem; color:var(--muted);}
+  .kpi-card .val{font-family:var(--font-display); font-weight:800; font-size:1.4rem; color:var(--navy);}
+  .icon-badge{width:38px; height:38px; border-radius:10px; background:var(--bg); display:flex; align-items:center; justify-content:center; color:var(--navy); font-size:1rem;}
+  .btn-navy{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .btn-navy:hover{background:var(--navy2); border-color:var(--navy2); color:#fff;}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dark)); border:0; color:var(--navy); font-weight:600;}
+  .btn-gold:hover{color:var(--navy); opacity:.92;}
+  .btn-outline-navy{border-color:var(--navy); color:var(--navy);}
+  .btn-outline-navy:hover{background:var(--navy); color:#fff;}
+  .sys-table th{font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); background:var(--bg); border-bottom:1px solid var(--line); padding:10px 14px;}
+  .sys-table td{padding:10px 14px; font-size:.86rem; border-bottom:1px solid var(--line); vertical-align:middle;}
+  .badge-status-active{background:#E6F4EC; color:var(--good); font-weight:700;}
+  .badge-status-suspended{background:#FBE7E4; color:var(--bad); font-weight:700;}
+  .badge-status-trialing{background:#FCF1DE; color:var(--warn); font-weight:700;}
+  .badge-status-pending{background:#FCF1DE; color:var(--warn); font-weight:700;}
+  .badge-status-confirmed{background:#E6F4EC; color:var(--good); font-weight:700;}
+  .badge-status-rejected{background:#FBE7E4; color:var(--bad); font-weight:700;}
+  .section{display:none;}
+  .section.active{display:block;}
+  .app-footer{padding:14px 22px; font-size:.75rem; color:var(--muted); text-align:center; border-top:1px solid var(--line); background:#fff;}
+  .toggle-payment-card{border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px;}
+  .color-swatch{width:34px; height:34px; border-radius:8px; border:1px solid var(--line); cursor:pointer;}
+  @media(max-width:900px){
+    #sidebar{transform:translateX(-100%);}
+    #sidebar.show{transform:translateX(0);}
+    main{margin-left:0;}
+    .toggle-btn{display:block;}
+    #sidebarBackdrop{position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:35; display:none;}
+    #sidebarBackdrop.show{display:block;}
+  }
+</style>
+</head>
+<body>
+<div id="loadingScreen">
+  <div class="loading-inner">
+    <div class="loading-mark">OKV</div>
+    <div class="loading-title">Super Admin Dashboard</div>
+    <div class="loading-sub">Loading platform data…</div>
+  </div>
+</div>
+
+<div class="app-shell" id="appShellWrap">
+  <div id="sidebarBackdrop"></div>
+  <nav id="sidebar">
+    <div class="brand">
+      <div class="mark">OKV</div>
+      <div><div class="txt">OKV Payroll &amp; HR</div><div class="sub">Super Admin</div></div>
+    </div>
+
+    <div class="nav-group-label">Overview</div>
+    <a class="side-link active" data-section="dashboard"><i class="bi bi-speedometer2"></i>Dashboard</a>
+
+    <div class="nav-group-label">Platform Management</div>
+    <a class="side-link" data-section="orgs"><i class="bi bi-building"></i>Organizations</a>
+    <a class="side-link" data-section="capacity"><i class="bi bi-hdd-stack"></i>Storage &amp; Capacity</a>
+    <a class="side-link" data-section="announcements"><i class="bi bi-megaphone"></i>Announcements</a>
+
+    <div class="nav-group-label">Configuration</div>
+    <a class="side-link" data-section="branding"><i class="bi bi-palette"></i>Branding &amp; Info</a>
+    <a class="side-link" data-section="payments"><i class="bi bi-credit-card-2-front"></i>Payment Methods</a>
+    <a class="side-link" data-section="comms"><i class="bi bi-broadcast"></i>Communications</a>
+    <a class="side-link" data-section="pricing"><i class="bi bi-tags"></i>Pricing &amp; Plans</a>
+
+    <div class="nav-group-label">Account</div>
+    <a class="side-link" data-section="account"><i class="bi bi-person-gear"></i>My Account</a>
+    <div class="sidebar-legal"><a href="../privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a> &middot; <a href="../terms-of-service.html" target="_blank" rel="noopener">Terms</a></div>
+  </nav>
+
+  <main>
+    <div id="topbar">
+      <div class="d-flex align-items-center gap-2">
+        <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-list"></i></button>
+        <h5 class="mb-0" id="pageTitle" style="color:var(--navy); font-weight:700;">Dashboard</h5>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-navy dropdown-toggle"><i class="bi bi-shield-lock me-1"></i>Super Admin</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <section class="section active" id="sec-dashboard">
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Organizations</div><div class="val" id="kpiOrgs">-</div></div><div class="icon-badge"><i class="bi bi-building"></i></div></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Active (Paid)</div><div class="val" id="kpiActive">-</div></div><div class="icon-badge"><i class="bi bi-patch-check"></i></div></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">On Trial</div><div class="val" id="kpiTrial">-</div></div><div class="icon-badge"><i class="bi bi-hourglass-split"></i></div></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Suspended</div><div class="val" id="kpiSuspended">-</div></div><div class="icon-badge"><i class="bi bi-slash-circle"></i></div></div></div></div>
+        </div>
+        <div class="card-panel">
+          <div class="panel-head"><h6><i class="bi bi-building me-1"></i>Recently Signed Up</h6></div>
+          <div class="panel-body p-0"><div class="table-responsive"><table class="table sys-table mb-0">
+            <thead><tr><th>Organization</th><th>Admin</th><th>Plan</th><th>Status</th><th>Joined</th></tr></thead>
+            <tbody id="recentOrgsBody"><tr><td colspan="5" class="text-center text-muted py-4">Loading…</td></tr></tbody>
+          </table></div></div>
+        </div>
+      </section>
+
+      <!-- ORGANIZATIONS -->
+      <section class="section" id="sec-orgs">
+        <div class="card-panel">
+          <div class="panel-head">
+            <h6><i class="bi bi-building me-1"></i>All Organizations</h6>
+            <input class="form-control form-control-sm" style="max-width:240px;" id="orgSearch" placeholder="Search organization or email...">
+          </div>
+          <div class="panel-body p-0"><div class="table-responsive"><table class="table sys-table mb-0">
+            <thead><tr><th>Organization</th><th>Admin Contact</th><th>Plan</th><th>Status</th><th>Subscription</th><th>Users</th><th></th></tr></thead>
+            <tbody id="orgsTableBody"><tr><td colspan="7" class="text-center text-muted py-4">Loading…</td></tr></tbody>
+          </table></div></div>
+        </div>
+      </section>
+
+      <!-- STORAGE & CAPACITY (Super Admin only — org Admins/Users never see this) -->
+      <section class="section" id="sec-capacity">
+        <div class="card-panel mb-3">
+          <div class="panel-head"><h6><i class="bi bi-hdd-stack me-1"></i>Google Sheets Cell-Capacity Overview</h6></div>
+          <div class="panel-body">
+            <p class="text-muted small mb-0">
+              Each organization has its own spreadsheet, capped at 10,000,000 cells by Google Sheets. This table reflects the
+              most recent automatic daily check — it is not recalculated on page load. Thresholds: <b>70%</b> used → Monitor,
+              <b>85%</b> used → Action Needed (an email alert is also sent to the platform inbox the first time an org crosses it).
+            </p>
+          </div>
+        </div>
+        <div class="card-panel">
+          <div class="panel-head"><h6 class="mb-0">All Organizations</h6></div>
+          <div class="panel-body p-0"><div class="table-responsive"><table class="table sys-table mb-0">
+            <thead><tr><th>Organization</th><th>Cells Used</th><th>% of Limit</th><th>Est. Time Remaining</th><th>Status</th><th>Recommended Action</th></tr></thead>
+            <tbody id="capacityTableBody"><tr><td colspan="6" class="text-center text-muted py-4">Loading…</td></tr></tbody>
+          </table></div></div>
+        </div>
+      </section>
+
+      <!-- ANNOUNCEMENTS -->
+      <section class="section" id="sec-announcements">
+        <div class="row g-3">
+          <div class="col-lg-7">
+            <div class="card-panel mb-3">
+              <div class="panel-head"><h6><i class="bi bi-megaphone me-1"></i>Compose a Message to Organizations</h6></div>
+              <div class="panel-body">
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Send to</label>
+                  <div class="d-flex gap-3 flex-wrap">
+                    <div class="form-check"><input class="form-check-input" type="radio" name="paAudience" id="paAll" value="all" checked><label class="form-check-label" for="paAll">All Organizations</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="paAudience" id="paIndividual" value="individual"><label class="form-check-label" for="paIndividual">Selected Organizations</label></div>
+                  </div>
+                  <div id="paOrgPicker" class="mt-2 border rounded p-2" style="display:none; max-height:180px; overflow:auto;"></div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Message Type</label>
+                  <select class="form-select form-select-sm" id="paType">
+                    <option value="announcement">General Announcement</option>
+                    <option value="custom">Personalized / Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Send Via</label>
+                  <div class="d-flex gap-3 flex-wrap">
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="paChEmail" checked><label class="form-check-label" for="paChEmail"><i class="bi bi-envelope me-1"></i>Email</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="paChSms"><label class="form-check-label" for="paChSms"><i class="bi bi-chat-text me-1"></i>SMS</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="paChWhatsapp"><label class="form-check-label" for="paChWhatsapp"><i class="bi bi-whatsapp me-1"></i>WhatsApp</label></div>
+                  </div>
+                </div>
+                <div class="mb-3"><label class="form-label small fw-bold">Subject</label><input type="text" class="form-control form-control-sm" id="paSubject" placeholder="e.g. Scheduled maintenance this weekend"></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Message</label><textarea class="form-control form-control-sm" id="paBody" rows="6" placeholder="Type your message. %NAME% is replaced with each Admin's name."></textarea></div>
+                <button class="btn btn-navy btn-sm" onclick="sendPlatformAnnouncement()"><i class="bi bi-send me-1"></i>Send to Organizations</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="card-panel" id="paResultsCard" style="display:none;">
+              <div class="panel-head"><h6><i class="bi bi-check-circle me-1"></i>Last Send Result</h6></div>
+              <div class="panel-body" id="paResults"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BRANDING & INFO -->
+      <section class="section" id="sec-branding">
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="card-panel mb-3">
+              <div class="panel-head"><h6><i class="bi bi-palette me-1"></i>Color Palette &amp; Logo</h6></div>
+              <div class="panel-body">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">Primary Color</label>
+                    <div class="d-flex align-items-center gap-2"><input type="color" class="color-swatch" id="cfgPrimaryColor" value="#0B1F3A"><input type="text" class="form-control form-control-sm" id="cfgPrimaryColorText" value="#0B1F3A"></div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">Accent Color</label>
+                    <div class="d-flex align-items-center gap-2"><input type="color" class="color-swatch" id="cfgAccentColor" value="#C9A24B"><input type="text" class="form-control form-control-sm" id="cfgAccentColorText" value="#C9A24B"></div>
+                  </div>
+                  <div class="col-12 mt-2">
+                    <label class="form-label small">Logo URL</label>
+                    <input type="text" class="form-control form-control-sm" id="cfgLogoUrl" placeholder="https://.../logo.png">
+                    <div class="form-text">Paste a hosted image link (e.g. from Google Drive, Imgur). Used across the public site once wired into the templates.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card-panel mb-3">
+              <div class="panel-head"><h6><i class="bi bi-info-circle me-1"></i>Company Contact Info</h6></div>
+              <div class="panel-body">
+                <label class="form-label small">Support Email</label>
+                <input type="email" class="form-control form-control-sm mb-2" id="cfgCompanyEmail">
+                <label class="form-label small">Phone / WhatsApp</label>
+                <input type="text" class="form-control form-control-sm mb-2" id="cfgCompanyPhone">
+                <label class="form-label small">Website</label>
+                <input type="text" class="form-control form-control-sm" id="cfgCompanyWebsite">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="saveBrandingSettings()"><i class="bi bi-check-lg me-1"></i>Save Branding &amp; Contact Info</button>
+        <div class="msg mt-2" id="brandingMsg" style="display:none;"></div>
+      </section>
+
+      <!-- PAYMENT METHODS -->
+      <section class="section" id="sec-payments">
+        <div class="card-panel mb-3">
+          <div class="panel-head">
+            <h6><i class="bi bi-bank me-1"></i>Manual Bank Transfer Methods</h6>
+            <button class="btn btn-sm btn-gold" onclick="addManualPaymentMethod()"><i class="bi bi-plus-lg me-1"></i>Add Method</button>
+          </div>
+          <div class="panel-body" id="manualPaymentMethodsBox"></div>
+        </div>
+
+        <div class="card-panel mb-3">
+          <div class="panel-head"><h6><i class="bi bi-cloud-arrow-up me-1"></i>Automatic Gateway Integration</h6></div>
+          <div class="panel-body">
+            <p class="text-muted small">Enter your API credentials and enable a gateway to make it available. <b>Note:</b> this stores your credentials securely for use by the checkout flow — wiring the actual Paystack/Remita/Flutterwave checkout screens to these credentials is a separate integration step beyond credential storage.</p>
+
+            <div class="toggle-payment-card">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <b><i class="bi bi-credit-card me-1"></i>Paystack</b>
+                <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="gwPaystackEnabled"></div>
+              </div>
+              <div class="row g-2">
+                <div class="col-md-6"><label class="form-label small">Secret Key</label><div class="pw-field"><input type="password" class="form-control form-control-sm" id="gwPaystackSecret" placeholder="sk_live_..."><button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button></div></div>
+                <div class="col-md-6"><label class="form-label small">Public Key</label><input type="text" class="form-control form-control-sm" id="gwPaystackPublic" placeholder="pk_live_..."></div>
+              </div>
+            </div>
+
+            <div class="toggle-payment-card">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <b><i class="bi bi-credit-card me-1"></i>Remita</b>
+                <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="gwRemitaEnabled"></div>
+              </div>
+              <div class="row g-2">
+                <div class="col-md-4"><label class="form-label small">Merchant ID</label><input type="text" class="form-control form-control-sm" id="gwRemitaMerchant"></div>
+                <div class="col-md-4"><label class="form-label small">API Key</label><div class="pw-field"><input type="password" class="form-control form-control-sm" id="gwRemitaApiKey"><button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button></div></div>
+                <div class="col-md-4"><label class="form-label small">Service Type ID</label><input type="text" class="form-control form-control-sm" id="gwRemitaServiceType"></div>
+              </div>
+            </div>
+
+            <div class="toggle-payment-card mb-0">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <b><i class="bi bi-credit-card me-1"></i>Flutterwave</b>
+                <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="gwFlutterwaveEnabled"></div>
+              </div>
+              <div class="row g-2">
+                <div class="col-md-6"><label class="form-label small">Secret Key</label><div class="pw-field"><input type="password" class="form-control form-control-sm" id="gwFlutterwaveSecret" placeholder="FLWSECK_..."><button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button></div></div>
+                <div class="col-md-6"><label class="form-label small">Public Key</label><input type="text" class="form-control form-control-sm" id="gwFlutterwavePublic" placeholder="FLWPUBK_..."></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="savePaymentSettings()"><i class="bi bi-check-lg me-1"></i>Save Payment Settings</button>
+        <div class="msg mt-2" id="paymentsMsg" style="display:none;"></div>
+      </section>
+
+      <!-- COMMUNICATIONS -->
+      <section class="section" id="sec-comms">
+        <div class="card-panel mb-3">
+          <div class="panel-head"><h6><i class="bi bi-chat-text me-1"></i>SMS Provider</h6></div>
+          <div class="panel-body">
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="commsSmsEnabled"><label class="form-check-label small">Enabled</label></div>
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">API URL</label><input type="text" class="form-control form-control-sm" id="commsSmsUrl" placeholder="https://api.yourprovider.com/sms/send"></div>
+              <div class="col-md-3"><label class="form-label small">API Key</label><div class="pw-field"><input type="password" class="form-control form-control-sm" id="commsSmsKey"><button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button></div></div>
+              <div class="col-md-3"><label class="form-label small">Sender ID</label><input type="text" class="form-control form-control-sm" id="commsSmsSender" placeholder="OKV"></div>
+            </div>
+            <div class="form-text mt-1">Works with Termii, Africa's Talking, or any provider accepting a similar JSON payload — see README for the exact request shape.</div>
+          </div>
+        </div>
+        <div class="card-panel mb-3">
+          <div class="panel-head"><h6><i class="bi bi-whatsapp me-1"></i>WhatsApp Provider</h6></div>
+          <div class="panel-body">
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="commsWaEnabled"><label class="form-check-label small">Enabled</label></div>
+            <div class="row g-2">
+              <div class="col-md-8"><label class="form-label small">API URL</label><input type="text" class="form-control form-control-sm" id="commsWaUrl" placeholder="https://api.yourprovider.com/whatsapp/send"></div>
+              <div class="col-md-4"><label class="form-label small">API Key</label><div class="pw-field"><input type="password" class="form-control form-control-sm" id="commsWaKey"><button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button></div></div>
+            </div>
+            <div class="form-text mt-1">Works with Twilio, Meta Cloud API, or Termii WhatsApp — see README for the exact request shape.</div>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="saveCommsSettings()"><i class="bi bi-check-lg me-1"></i>Save Communications Settings</button>
+        <div class="msg mt-2" id="commsMsg" style="display:none;"></div>
+      </section>
+
+      <!-- PRICING & PLANS -->
+      <section class="section" id="sec-pricing">
+        <div class="card-panel mb-3">
+          <div class="panel-head"><h6><i class="bi bi-tags me-1"></i>Essential Plan</h6></div>
+          <div class="panel-body">
+            <div class="row g-2">
+              <div class="col-md-4"><label class="form-label small">Monthly (₦)</label><input type="number" class="form-control form-control-sm" id="planEssentialMonthly"></div>
+              <div class="col-md-4"><label class="form-label small">Bi-Annual (₦)</label><input type="number" class="form-control form-control-sm" id="planEssentialBiannual"></div>
+              <div class="col-md-4"><label class="form-label small">Yearly (₦)</label><input type="number" class="form-control form-control-sm" id="planEssentialYearly"></div>
+              <div class="col-12"><label class="form-label small">Suitable For</label><textarea class="form-control form-control-sm" id="planEssentialSuitable" rows="2"></textarea></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-panel mb-3">
+          <div class="panel-head"><h6><i class="bi bi-tags-fill me-1"></i>Enterprise Plan</h6></div>
+          <div class="panel-body">
+            <div class="row g-2">
+              <div class="col-md-4"><label class="form-label small">Monthly (₦)</label><input type="number" class="form-control form-control-sm" id="planEnterpriseMonthly"></div>
+              <div class="col-md-4"><label class="form-label small">Bi-Annual (₦)</label><input type="number" class="form-control form-control-sm" id="planEnterpriseBiannual"></div>
+              <div class="col-md-4"><label class="form-label small">Yearly (₦)</label><input type="number" class="form-control form-control-sm" id="planEnterpriseYearly"></div>
+              <div class="col-12"><label class="form-label small">Suitable For</label><textarea class="form-control form-control-sm" id="planEnterpriseSuitable" rows="2"></textarea></div>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-warning small"><i class="bi bi-info-circle me-1"></i>These prices apply to new upgrade requests going forward. The public pricing page (<code>pricing.html</code>) shows its own static copy for speed — update it to match if you change prices here.</div>
+        <button class="btn btn-gold" onclick="savePricingSettings()"><i class="bi bi-check-lg me-1"></i>Save Pricing</button>
+        <div class="msg mt-2" id="pricingMsg" style="display:none;"></div>
+      </section>
+
+      <!-- MY ACCOUNT -->
+      <section class="section" id="sec-account">
+        <div class="card-panel" style="max-width:480px;">
+          <div class="panel-head"><h6><i class="bi bi-key me-1"></i>Change Password</h6></div>
+          <div class="panel-body">
+            <label class="form-label small">Current Password</label>
+            <div class="pw-field mb-2"><input type="password" class="form-control form-control-sm" id="saCurPassword"><button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button></div>
+            <label class="form-label small">New Password</label>
+            <div class="pw-field mb-3"><input type="password" class="form-control form-control-sm" id="saNewPassword"><button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button></div>
+            <button class="btn btn-navy btn-sm" onclick="submitSuperAdminPasswordChange()"><i class="bi bi-check-lg me-1"></i>Update Password</button>
+            <div class="msg mt-2" id="saAccountMsg" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <div class="app-footer">Super Admin Dashboard &middot; OKV Nigeria Payroll &amp; HR Management System &middot; <a href="#" onclick="superAdminLogout(); return false;" class="text-danger">Log Out</a></div>
+  </main>
+</div>
+
+<!-- ORG DETAILS MODAL -->
+<div class="modal fade" id="orgModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+  <div class="modal-header bg-light"><h6 class="modal-title" id="orgModalTitle">Organization Details</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <form id="orgForm" class="row g-2">
+      <input type="hidden" name="orgId">
+      <div class="col-md-6"><label class="form-label">Organization Name</label><input class="form-control" name="orgName"></div>
+      <div class="col-md-6"><label class="form-label">Admin Full Name</label><input class="form-control" name="fullName"></div>
+      <div class="col-md-6"><label class="form-label">Admin Email</label><input type="email" class="form-control" name="email"></div>
+      <div class="col-md-6"><label class="form-label">Admin Phone</label><input class="form-control" name="phone"></div>
+      <hr class="my-3">
+      <div class="col-md-4"><label class="form-label">Plan</label>
+        <select class="form-select" name="plan"><option value="Essential">Essential</option><option value="Enterprise">Enterprise</option></select>
+      </div>
+      <div class="col-md-4"><label class="form-label">Billing Cycle</label>
+        <select class="form-select" name="billingCycle"><option value="monthly">Monthly</option><option value="biannual">Bi-Annual</option><option value="yearly">Yearly</option></select>
+      </div>
+      <div class="col-md-4"><label class="form-label">Subscription Status</label>
+        <select class="form-select" name="subscriptionStatus"><option value="trialing">Trialing</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+      <div class="col-md-6"><label class="form-label">Subscription Expiry</label><input type="date" class="form-control" name="subscriptionExpiry"></div>
+      <div class="col-md-6"><label class="form-label">Trial Ends At</label><input type="date" class="form-control" name="trialEndsAt"></div>
+    </form>
+  </div>
+  <div class="modal-footer"><button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button><button class="btn btn-navy btn-sm" onclick="saveOrgDetails()">Save Changes</button></div>
+</div></div></div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="mainToast" class="toast align-items-center text-bg-dark border-0" role="alert">
+    <div class="d-flex"><div class="toast-body" id="toastMsg">Saved.</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="config.js"></script>
+<script src="okv-auth.js"></script>
+<script>
+let currentUser = null;
+let sessionToken = null;
+let orgsCache = [];
+
+function toast(msg){
+  const box = document.getElementById('mainToast');
+  document.getElementById('toastMsg').textContent = msg;
+  (bootstrap.Toast.getInstance(box) || new bootstrap.Toast(box, {delay:3500})).show();
+}
+function showModal(id){ const el = document.getElementById(id); (bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el)).show(); }
+function hideModal(id){ const el = document.getElementById(id); const inst = bootstrap.Modal.getInstance(el); if(inst) inst.hide(); }
+function statusBadge(status){
+  const key = String(status||'').toLowerCase().replace(/\s+/g,'');
+  return '<span class="badge rounded-pill badge-status-' + key + '">' + status + '</span>';
+}
+function fmtN(n){ return '₦' + Number(n||0).toLocaleString('en-NG'); }
+
+/* ---------- Sidebar / navigation ---------- */
+const TITLES = { dashboard:'Dashboard', orgs:'Organizations', capacity:'Storage & Capacity', announcements:'Announcements', branding:'Branding & Info', payments:'Payment Methods', comms:'Communications', pricing:'Pricing & Plans', account:'My Account' };
+let currentSection = 'dashboard';
+function showSection(name){
+  document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.section === name));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  document.getElementById('pageTitle').textContent = TITLES[name] || name;
+  currentSection = name;
+  const map = { dashboard: renderDashboard, orgs: renderOrgs, capacity: renderCapacity, announcements: renderAnnouncements, branding: renderSettingsForm, payments: renderSettingsForm, comms: renderSettingsForm, pricing: renderSettingsForm, account: () => {} };
+  if(map[name]) map[name]();
+  closeMobileSidebar();
+}
+/* Auto-refresh — read-only/display sections only. Deliberately excludes branding/payments/
+   comms/pricing/account/announcements, since those render directly into live form fields;
+   silently overwriting an in-progress edit every 30s would be worse than not refreshing. */
+const LIVE_REFRESH_SECTIONS = ['dashboard', 'orgs', 'capacity'];
+setInterval(() => {
+  if(navigator.onLine && sessionToken && LIVE_REFRESH_SECTIONS.includes(currentSection)){
+    const map = { dashboard: renderDashboard, orgs: renderOrgs, capacity: renderCapacity };
+    map[currentSection]();
+  }
+}, 30000);
+document.querySelectorAll('.side-link').forEach(link => link.addEventListener('click', () => showSection(link.dataset.section)));
+function openMobileSidebar(){ document.getElementById('sidebar').classList.add('show'); document.getElementById('sidebarBackdrop').classList.add('show'); }
+function closeMobileSidebar(){ document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarBackdrop').classList.remove('show'); }
+document.getElementById('sidebarToggle')?.addEventListener('click', openMobileSidebar);
+document.getElementById('sidebarBackdrop')?.addEventListener('click', closeMobileSidebar);
+
+function superAdminLogout(){
+  clearSuperAdminSession();
+  window.location.href = 'index.html';
+}
+
+/* ---------- Dashboard ---------- */
+async function renderDashboard(){
+  try{
+    const res = await apiCall('superAdminListOrgs', {sessionToken});
+    orgsCache = res.orgs || [];
+    const active = orgsCache.filter(o => o.subscriptionStatus === 'active').length;
+    const trialing = orgsCache.filter(o => o.subscriptionStatus === 'trialing').length;
+    const suspended = orgsCache.filter(o => o.status === 'Suspended').length;
+    document.getElementById('kpiOrgs').textContent = orgsCache.length;
+    document.getElementById('kpiActive').textContent = active;
+    document.getElementById('kpiTrial').textContent = trialing;
+    document.getElementById('kpiSuspended').textContent = suspended;
+
+    const recent = [...orgsCache].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 8);
+    document.getElementById('recentOrgsBody').innerHTML = recent.length ? recent.map(o => `
+      <tr><td>${o.orgName}</td><td>${o.fullName} — ${o.email}</td><td>${o.plan||'—'}</td>
+      <td>${statusBadge(o.status)} ${statusBadge(o.subscriptionStatus)}</td>
+      <td class="small text-muted">${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '—'}</td></tr>
+    `).join('') : '<tr><td colspan="5" class="text-center text-muted py-4">No organizations yet.</td></tr>';
+  }catch(err){ toast('Failed to load: ' + err.message); }
+}
+
+/* ---------- Organizations ---------- */
+async function renderOrgs(){
+  try{
+    const res = await apiCall('superAdminListOrgs', {sessionToken});
+    orgsCache = res.orgs || [];
+    drawOrgsTable(orgsCache);
+  }catch(err){
+    document.getElementById('orgsTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">' + err.message + '</td></tr>';
+  }
+}
+function drawOrgsTable(list){
+  const tbody = document.getElementById('orgsTableBody');
+  tbody.innerHTML = list.length ? list.map(o => `
+    <tr>
+      <td>${o.orgName}</td>
+      <td>${o.fullName}<br><span class="text-muted small">${o.email}${o.phone ? ' · ' + o.phone : ''}</span></td>
+      <td>${o.plan || '—'} <span class="text-muted small">(${o.billingCycle||''})</span></td>
+      <td>${statusBadge(o.status)}</td>
+      <td>${statusBadge(o.subscriptionStatus)}${o.subscriptionExpiry ? '<div class="text-muted small">due ' + new Date(o.subscriptionExpiry).toLocaleDateString() + '</div>' : ''}</td>
+      <td>${o.userCount}</td>
+      <td class="text-nowrap">
+        <button class="btn btn-sm btn-outline-navy" title="Edit" onclick="openOrgModal('${o.orgId}')"><i class="bi bi-pencil"></i></button>
+        <button class="btn btn-sm ${o.status==='Suspended' ? 'btn-outline-success' : 'btn-outline-warning'}" title="${o.status==='Suspended'?'Activate':'Suspend'}" onclick="toggleOrgStatus('${o.orgId}','${o.status}')"><i class="bi ${o.status==='Suspended'?'bi-check-circle':'bi-slash-circle'}"></i></button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="7" class="text-center text-muted py-4">No organizations yet.</td></tr>';
+}
+document.getElementById('orgSearch')?.addEventListener('input', function(){
+  const q = this.value.toLowerCase();
+  drawOrgsTable(orgsCache.filter(o => (o.orgName+o.email+o.fullName).toLowerCase().includes(q)));
+});
+
+/* ---------- Storage & Capacity (Super Admin only) ---------- */
+function capacityBadge_(status){
+  const cls = status === 'Action Needed' ? 'bg-danger' : (status === 'Monitor' ? 'bg-warning text-dark' : (status === 'Healthy' ? 'bg-success' : 'bg-secondary'));
+  return `<span class="badge ${cls}">${status}</span>`;
+}
+async function renderCapacity(){
+  const tbody = document.getElementById('capacityTableBody');
+  try{
+    const res = await apiCall('superAdminGetCapacityOverview', {sessionToken});
+    const orgs = res.orgs || [];
+    tbody.innerHTML = orgs.length ? orgs.map(o => {
+      const pct = (o.cellPercentUsed === null || o.cellPercentUsed === undefined) ? null : o.cellPercentUsed;
+      const eta = (o.estMonthsRemaining === null || o.estMonthsRemaining === undefined)
+        ? '—'
+        : (o.estMonthsRemaining <= 0 ? 'Imminent' : (o.estMonthsRemaining < 1 ? '< 1 month' : Math.round(o.estMonthsRemaining) + ' month' + (Math.round(o.estMonthsRemaining) === 1 ? '' : 's')));
+      const barCls = o.capacityStatus === 'Action Needed' ? 'bg-danger' : (o.capacityStatus === 'Monitor' ? 'bg-warning' : 'bg-success');
+      return `
+      <tr>
+        <td>${o.orgName}</td>
+        <td>${o.cellsUsed === null ? '—' : Number(o.cellsUsed).toLocaleString('en-NG')}</td>
+        <td style="min-width:160px;">
+          ${pct === null ? '<span class="text-muted small">Not yet checked</span>' : `
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1" style="height:8px;"><div class="progress-bar ${barCls}" style="width:${Math.min(100,pct)}%"></div></div>
+              <span class="small">${pct.toFixed(1)}%</span>
+            </div>`}
+        </td>
+        <td>${eta}</td>
+        <td>${capacityBadge_(o.capacityStatus)}</td>
+        <td class="small text-muted">${o.guidance || ''}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">No organizations yet.</td></tr>';
+  }catch(err){
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">' + err.message + '</td></tr>';
+  }
+}
+function openOrgModal(orgId){
+  const o = orgsCache.find(x => x.orgId === orgId);
+  if(!o) return;
+  const form = document.getElementById('orgForm');
+  form.reset();
+  document.getElementById('orgModalTitle').textContent = o.orgName;
+  form.querySelector('[name="orgId"]').value = o.orgId;
+  form.querySelector('[name="orgName"]').value = o.orgName || '';
+  form.querySelector('[name="fullName"]').value = o.fullName || '';
+  form.querySelector('[name="email"]').value = o.email || '';
+  form.querySelector('[name="phone"]').value = o.phone || '';
+  form.querySelector('[name="plan"]').value = o.plan || 'Essential';
+  form.querySelector('[name="billingCycle"]').value = o.billingCycle || 'monthly';
+  form.querySelector('[name="subscriptionStatus"]').value = o.subscriptionStatus || 'trialing';
+  form.querySelector('[name="subscriptionExpiry"]').value = o.subscriptionExpiry ? o.subscriptionExpiry.slice(0,10) : '';
+  form.querySelector('[name="trialEndsAt"]').value = o.trialEndsAt ? o.trialEndsAt.slice(0,10) : '';
+  showModal('orgModal');
+}
+async function saveOrgDetails(){
+  const form = document.getElementById('orgForm');
+  const fd = new FormData(form);
+  const orgId = fd.get('orgId');
+  try{
+    await apiCall('superAdminUpdateOrgContact', {sessionToken, orgId, orgName: fd.get('orgName'), fullName: fd.get('fullName'), email: fd.get('email'), phone: fd.get('phone')});
+    await apiCall('superAdminSetOrgPlan', {
+      sessionToken, orgId, plan: fd.get('plan'), billingCycle: fd.get('billingCycle'),
+      subscriptionStatus: fd.get('subscriptionStatus'),
+      subscriptionExpiry: fd.get('subscriptionExpiry') ? new Date(fd.get('subscriptionExpiry')).toISOString() : '',
+      trialEndsAt: fd.get('trialEndsAt') ? new Date(fd.get('trialEndsAt')).toISOString() : ''
+    });
+    hideModal('orgModal');
+    toast('Organization updated.');
+    renderOrgs();
+  }catch(err){ toast('Failed: ' + err.message); }
+}
+async function toggleOrgStatus(orgId, currentStatus){
+  const next = currentStatus === 'Suspended' ? 'Active' : 'Suspended';
+  if(!confirm((next==='Suspended' ? 'Suspend' : 'Reactivate') + ' this organization? ' + (next==='Suspended' ? 'Every user in it will be signed out and unable to log in.' : ''))) return;
+  try{
+    await apiCall('superAdminSetOrgStatus', {sessionToken, orgId, status: next});
+    toast('Organization ' + (next==='Suspended' ? 'suspended.' : 'reactivated.'));
+    renderOrgs();
+  }catch(err){ toast('Failed: ' + err.message); }
+}
+
+/* ---------- Platform Announcements ---------- */
+function renderAnnouncements(){
+  const box = document.getElementById('paOrgPicker');
+  box.innerHTML = orgsCache.map(o => `
+    <div class="form-check"><input class="form-check-input pa-org-chk" type="checkbox" value="${o.orgId}" id="paOrg-${o.orgId}">
+    <label class="form-check-label small" for="paOrg-${o.orgId}">${o.orgName} — ${o.fullName}</label></div>`).join('') || '<div class="text-muted small">No organizations yet.</div>';
+}
+document.querySelectorAll('input[name="paAudience"]').forEach(r => r.addEventListener('change', () => {
+  document.getElementById('paOrgPicker').style.display = document.getElementById('paIndividual').checked ? 'block' : 'none';
+}));
+async function sendPlatformAnnouncement(){
+  const audience = document.querySelector('input[name="paAudience"]:checked').value;
+  const type = document.getElementById('paType').value;
+  const subject = document.getElementById('paSubject').value.trim() || 'Message from OKV Technology Consults';
+  const bodyTemplate = document.getElementById('paBody').value.trim();
+  if(!bodyTemplate){ toast('Write a message first.'); return; }
+  const channels = [];
+  if(document.getElementById('paChEmail').checked) channels.push('email');
+  if(document.getElementById('paChSms').checked) channels.push('sms');
+  if(document.getElementById('paChWhatsapp').checked) channels.push('whatsapp');
+  if(!channels.length){ toast('Choose at least one channel.'); return; }
+
+  const targets = audience === 'all' ? orgsCache : orgsCache.filter(o => [...document.querySelectorAll('.pa-org-chk:checked')].map(c=>c.value).includes(o.orgId));
+  if(!targets.length){ toast('No organizations selected.'); return; }
+  const recipients = targets.map(o => ({ name: o.fullName, email: o.email, phone: o.phone, body: bodyTemplate.replace(/%NAME%/g, o.fullName || o.orgName) }));
+
+  let totalSent = 0; const allFailed = [];
+  for(const channel of channels){
+    try{
+      const res = await apiCall('superAdminSendMessage', {sessionToken, channel, subject, sharedBody: bodyTemplate, messageType: type, recipients});
+      totalSent += res.sent || 0;
+      (res.failed||[]).forEach(f => allFailed.push(f));
+    }catch(err){ toast('Send failed: ' + err.message); return; }
+  }
+  const card = document.getElementById('paResultsCard'), out = document.getElementById('paResults');
+  card.style.display = 'block';
+  out.innerHTML = `<p class="mb-2"><b>${totalSent}</b> sent successfully.</p>` + (allFailed.length ? '<p class="text-danger small mb-1"><b>'+allFailed.length+'</b> failed:</p><ul class="small text-muted mb-0">' + allFailed.map(f=>`<li>${f.name} — ${f.reason}</li>`).join('') + '</ul>' : '');
+  toast('Sent to ' + targets.length + ' organization(s) across ' + channels.length + ' channel(s).');
+}
+
+/* ---------- Settings (Branding / Payments / Comms / Pricing share one payload) ---------- */
+let settingsCache = null;
+async function loadSettingsIfNeeded(){
+  if(settingsCache) return settingsCache;
+  const res = await apiCall('superAdminGetSettings', {sessionToken});
+  settingsCache = res.settings;
+  return settingsCache;
+}
+async function renderSettingsForm(){
+  try{
+    const s = await loadSettingsIfNeeded();
+    document.getElementById('cfgPrimaryColor').value = s.primaryColor; document.getElementById('cfgPrimaryColorText').value = s.primaryColor;
+    document.getElementById('cfgAccentColor').value = s.accentColor; document.getElementById('cfgAccentColorText').value = s.accentColor;
+    document.getElementById('cfgLogoUrl').value = s.logoUrl || '';
+    document.getElementById('cfgCompanyEmail').value = s.companyEmail || '';
+    document.getElementById('cfgCompanyPhone').value = s.companyPhone || '';
+    document.getElementById('cfgCompanyWebsite').value = s.companyWebsite || '';
+
+    drawManualPaymentMethods(s.manualPaymentMethods || []);
+    const g = s.gateways || {};
+    document.getElementById('gwPaystackEnabled').checked = !!(g.paystack && g.paystack.enabled);
+    document.getElementById('gwPaystackSecret').value = (g.paystack && g.paystack.secretKey) || '';
+    document.getElementById('gwPaystackPublic').value = (g.paystack && g.paystack.publicKey) || '';
+    document.getElementById('gwRemitaEnabled').checked = !!(g.remita && g.remita.enabled);
+    document.getElementById('gwRemitaMerchant').value = (g.remita && g.remita.merchantId) || '';
+    document.getElementById('gwRemitaApiKey').value = (g.remita && g.remita.apiKey) || '';
+    document.getElementById('gwRemitaServiceType').value = (g.remita && g.remita.serviceTypeId) || '';
+    document.getElementById('gwFlutterwaveEnabled').checked = !!(g.flutterwave && g.flutterwave.enabled);
+    document.getElementById('gwFlutterwaveSecret').value = (g.flutterwave && g.flutterwave.secretKey) || '';
+    document.getElementById('gwFlutterwavePublic').value = (g.flutterwave && g.flutterwave.publicKey) || '';
+
+    const c = s.comms || {};
+    document.getElementById('commsSmsEnabled').checked = !!(c.sms && c.sms.enabled);
+    document.getElementById('commsSmsUrl').value = (c.sms && c.sms.apiUrl) || '';
+    document.getElementById('commsSmsKey').value = (c.sms && c.sms.apiKey) || '';
+    document.getElementById('commsSmsSender').value = (c.sms && c.sms.senderId) || 'OKV';
+    document.getElementById('commsWaEnabled').checked = !!(c.whatsapp && c.whatsapp.enabled);
+    document.getElementById('commsWaUrl').value = (c.whatsapp && c.whatsapp.apiUrl) || '';
+    document.getElementById('commsWaKey').value = (c.whatsapp && c.whatsapp.apiKey) || '';
+
+    const p = s.plans || {};
+    if(p.Essential){
+      document.getElementById('planEssentialMonthly').value = p.Essential.monthly || '';
+      document.getElementById('planEssentialBiannual').value = p.Essential.biannual || '';
+      document.getElementById('planEssentialYearly').value = p.Essential.yearly || '';
+      document.getElementById('planEssentialSuitable').value = p.Essential.suitableFor || '';
+    }
+    if(p.Enterprise){
+      document.getElementById('planEnterpriseMonthly').value = p.Enterprise.monthly || '';
+      document.getElementById('planEnterpriseBiannual').value = p.Enterprise.biannual || '';
+      document.getElementById('planEnterpriseYearly').value = p.Enterprise.yearly || '';
+      document.getElementById('planEnterpriseSuitable').value = p.Enterprise.suitableFor || '';
+    }
+  }catch(err){ toast('Failed to load settings: ' + err.message); }
+}
+document.getElementById('cfgPrimaryColor')?.addEventListener('input', function(){ document.getElementById('cfgPrimaryColorText').value = this.value; });
+document.getElementById('cfgAccentColor')?.addEventListener('input', function(){ document.getElementById('cfgAccentColorText').value = this.value; });
+
+let manualMethodCount = 0;
+function drawManualPaymentMethods(methods){
+  manualMethodCount = 0;
+  const box = document.getElementById('manualPaymentMethodsBox');
+  box.innerHTML = '';
+  methods.forEach(m => addManualPaymentMethod(m));
+  if(!methods.length) addManualPaymentMethod();
+}
+function addManualPaymentMethod(existing){
+  const id = 'mpm-' + (manualMethodCount++);
+  const m = existing || {label:'Bank Transfer', accountNumber:'', bankName:'', accountName:'', enabled:true};
+  const div = document.createElement('div');
+  div.className = 'toggle-payment-card';
+  div.id = id;
+  div.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="form-check form-switch mb-0"><input class="form-check-input mpm-enabled" type="checkbox" ${m.enabled!==false?'checked':''}><label class="form-check-label small">Enabled</label></div>
+      <button class="btn btn-sm btn-outline-danger" onclick="document.getElementById('${id}').remove()"><i class="bi bi-trash"></i></button>
+    </div>
+    <div class="row g-2">
+      <div class="col-md-3"><label class="form-label small">Label</label><input class="form-control form-control-sm mpm-label" value="${m.label||''}" placeholder="e.g. Primary Account"></div>
+      <div class="col-md-3"><label class="form-label small">Account Number</label><input class="form-control form-control-sm mpm-acctnum" value="${m.accountNumber||''}"></div>
+      <div class="col-md-3"><label class="form-label small">Bank Name</label><input class="form-control form-control-sm mpm-bank" value="${m.bankName||''}"></div>
+      <div class="col-md-3"><label class="form-label small">Account Name</label><input class="form-control form-control-sm mpm-acctname" value="${m.accountName||''}"></div>
+    </div>`;
+  document.getElementById('manualPaymentMethodsBox').appendChild(div);
+}
+function collectManualPaymentMethods(){
+  return [...document.querySelectorAll('#manualPaymentMethodsBox .toggle-payment-card')].map((card,i) => ({
+    id: 'method' + i,
+    enabled: card.querySelector('.mpm-enabled').checked,
+    label: card.querySelector('.mpm-label').value.trim(),
+    accountNumber: card.querySelector('.mpm-acctnum').value.trim(),
+    bankName: card.querySelector('.mpm-bank').value.trim(),
+    accountName: card.querySelector('.mpm-acctname').value.trim()
+  })).filter(m => m.accountNumber);
+}
+function showSaveMsg(id, ok, text){
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  el.className = 'msg mt-2 alert py-2 ' + (ok ? 'alert-success' : 'alert-danger');
+  el.textContent = text;
+}
+async function saveBrandingSettings(){
+  try{
+    const s = await loadSettingsIfNeeded();
+    const updated = Object.assign({}, s, {
+      primaryColor: document.getElementById('cfgPrimaryColorText').value,
+      accentColor: document.getElementById('cfgAccentColorText').value,
+      logoUrl: document.getElementById('cfgLogoUrl').value.trim(),
+      companyEmail: document.getElementById('cfgCompanyEmail').value.trim(),
+      companyPhone: document.getElementById('cfgCompanyPhone').value.trim(),
+      companyWebsite: document.getElementById('cfgCompanyWebsite').value.trim()
+    });
+    const res = await apiCall('superAdminSaveSettings', {sessionToken, settings: updated});
+    settingsCache = res.settings;
+    showSaveMsg('brandingMsg', true, 'Branding and contact info saved.');
+  }catch(err){ showSaveMsg('brandingMsg', false, err.message); }
+}
+async function savePaymentSettings(){
+  try{
+    const s = await loadSettingsIfNeeded();
+    const updated = Object.assign({}, s, {
+      manualPaymentMethods: collectManualPaymentMethods(),
+      gateways: {
+        paystack: { enabled: document.getElementById('gwPaystackEnabled').checked, secretKey: document.getElementById('gwPaystackSecret').value.trim(), publicKey: document.getElementById('gwPaystackPublic').value.trim() },
+        remita: { enabled: document.getElementById('gwRemitaEnabled').checked, merchantId: document.getElementById('gwRemitaMerchant').value.trim(), apiKey: document.getElementById('gwRemitaApiKey').value.trim(), serviceTypeId: document.getElementById('gwRemitaServiceType').value.trim() },
+        flutterwave: { enabled: document.getElementById('gwFlutterwaveEnabled').checked, secretKey: document.getElementById('gwFlutterwaveSecret').value.trim(), publicKey: document.getElementById('gwFlutterwavePublic').value.trim() }
+      }
+    });
+    const res = await apiCall('superAdminSaveSettings', {sessionToken, settings: updated});
+    settingsCache = res.settings;
+    showSaveMsg('paymentsMsg', true, 'Payment settings saved.');
+  }catch(err){ showSaveMsg('paymentsMsg', false, err.message); }
+}
+async function saveCommsSettings(){
+  try{
+    const s = await loadSettingsIfNeeded();
+    const updated = Object.assign({}, s, {
+      comms: {
+        sms: { enabled: document.getElementById('commsSmsEnabled').checked, apiUrl: document.getElementById('commsSmsUrl').value.trim(), apiKey: document.getElementById('commsSmsKey').value.trim(), senderId: document.getElementById('commsSmsSender').value.trim() || 'OKV' },
+        whatsapp: { enabled: document.getElementById('commsWaEnabled').checked, apiUrl: document.getElementById('commsWaUrl').value.trim(), apiKey: document.getElementById('commsWaKey').value.trim() }
+      }
+    });
+    const res = await apiCall('superAdminSaveSettings', {sessionToken, settings: updated});
+    settingsCache = res.settings;
+    showSaveMsg('commsMsg', true, 'Communications settings saved.');
+  }catch(err){ showSaveMsg('commsMsg', false, err.message); }
+}
+async function savePricingSettings(){
+  try{
+    const s = await loadSettingsIfNeeded();
+    const updated = Object.assign({}, s, {
+      plans: {
+        Essential: {
+          monthly: Number(document.getElementById('planEssentialMonthly').value||0),
+          biannual: Number(document.getElementById('planEssentialBiannual').value||0),
+          yearly: Number(document.getElementById('planEssentialYearly').value||0),
+          suitableFor: document.getElementById('planEssentialSuitable').value.trim()
+        },
+        Enterprise: {
+          monthly: Number(document.getElementById('planEnterpriseMonthly').value||0),
+          biannual: Number(document.getElementById('planEnterpriseBiannual').value||0),
+          yearly: Number(document.getElementById('planEnterpriseYearly').value||0),
+          suitableFor: document.getElementById('planEnterpriseSuitable').value.trim()
+        }
+      }
+    });
+    const res = await apiCall('superAdminSaveSettings', {sessionToken, settings: updated});
+    settingsCache = res.settings;
+    showSaveMsg('pricingMsg', true, 'Pricing saved — new upgrade requests will use these amounts.');
+  }catch(err){ showSaveMsg('pricingMsg', false, err.message); }
+}
+
+/* ---------- My Account ---------- */
+async function submitSuperAdminPasswordChange(){
+  const cur = document.getElementById('saCurPassword').value;
+  const next = document.getElementById('saNewPassword').value;
+  const msgEl = document.getElementById('saAccountMsg');
+  if(!next || next.length < 8){ showSaveMsg('saAccountMsg', false, 'New password must be at least 8 characters.'); return; }
+  try{
+    const currentPasswordHash = await sha256Hex(cur);
+    const newPasswordHash = await sha256Hex(next);
+    await apiCall('superAdminChangePassword', {sessionToken, currentPasswordHash, newPasswordHash});
+    resetPasswordField('saCurPassword');
+    resetPasswordField('saNewPassword');
+    showSaveMsg('saAccountMsg', true, 'Password updated.');
+  }catch(err){ showSaveMsg('saAccountMsg', false, err.message); }
+}
+
+/* ---------- Boot ---------- */
+(async function boot(){
+  const session = getSuperAdminSession();
+  if(!session || !session.sessionToken || !session.user || !session.user.isSuperAdmin){
+    window.location.replace('index.html');
+    return;
+  }
+  currentUser = session.user;
+  sessionToken = session.sessionToken;
+  try{
+    await renderDashboard();
+  }catch(err){
+    if(/session|suspended/i.test(err.message)){
+      clearSuperAdminSession();
+      window.location.replace('index.html');
+      return;
+    }
+  }
+  document.getElementById('loadingScreen').classList.add('hide');
+  setTimeout(() => document.getElementById('loadingScreen').remove(), 400);
+})();
+</script>
+</body>
+</html>

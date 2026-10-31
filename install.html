@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Install — OKV Nigeria Payroll &amp; HR (Online)</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B1F3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OKV Payroll">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A; --navy2:#122C52; --navy3:#1B3A6B;
+    --gold:#C9A24B; --gold-light:#E7CE8F; --gold-dark:#A9832E;
+    --font-display:'Sora',Arial,sans-serif; --font-body:'Inter',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; min-height:100vh; font-family:var(--font-body); color:#fff;
+    background:radial-gradient(1200px 700px at 15% -10%, var(--navy3) 0%, var(--navy2) 45%, var(--navy) 100%);
+    display:flex; flex-direction:column; align-items:center; padding:28px 20px 40px;
+  }
+  .wrap{max-width:520px; width:100%; margin:0 auto;}
+  .mark{
+    width:56px; height:56px; border-radius:16px; margin:0 auto 18px;
+    background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:var(--navy);
+    font-family:var(--font-display); font-weight:800; font-size:1rem;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(0,0,0,.32);
+  }
+  .center{text-align:center;}
+  .eyebrow{font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-light); font-weight:700; margin-bottom:10px;}
+  h1{font-family:var(--font-display); font-weight:800; font-size:1.6rem; line-height:1.2; margin:0 0 10px;}
+  p.lede{color:#c6d1e6; font-size:.92rem; line-height:1.55; margin:0 0 24px;}
+
+  .btn{
+    font-family:var(--font-body); font-weight:700; font-size:1rem; border:0; border-radius:12px;
+    padding:16px 22px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    text-decoration:none; width:100%;
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:var(--navy); box-shadow:0 10px 26px rgba(201,162,75,.25);}
+  .install-icon{
+    width:64px; height:64px; border-radius:18px; margin:0 auto 16px;
+    background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:var(--navy);
+    display:flex; align-items:center; justify-content:center; font-size:1.9rem;
+    animation:pulseIcon 1.8s ease-in-out infinite;
+  }
+  @keyframes pulseIcon{
+    0%,100%{ box-shadow:0 0 0 0 rgba(201,162,75,.45); }
+    50%{ box-shadow:0 0 0 12px rgba(201,162,75,0); }
+  }
+  .status-line{font-size:.8rem; color:#9fb0cc; margin-top:10px; min-height:18px;}
+
+  .detected-badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:.75rem; font-weight:600; color:var(--navy);
+    background:var(--gold-light); padding:4px 10px; border-radius:20px; margin-bottom:14px;
+  }
+
+  .device-tabs{display:flex; gap:6px; margin:28px 0 14px; overflow-x:auto; padding-bottom:2px;}
+  .device-tab{
+    flex:0 0 auto; font-size:.78rem; font-weight:600; color:#c6d1e6; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:8px 14px; cursor:pointer; white-space:nowrap;
+  }
+  .device-tab.active{background:var(--gold); color:var(--navy); border-color:var(--gold);}
+
+  .instructions-card{
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:16px;
+    padding:20px; text-align:left;
+  }
+  .instructions-card h3{font-family:var(--font-display); font-size:1rem; font-weight:700; margin:0 0 4px; display:flex; align-items:center; gap:8px;}
+  .instructions-card .sub{font-size:.78rem; color:#9fb0cc; margin-bottom:14px;}
+  .steps{list-style:none; margin:0; padding:0; counter-reset:step;}
+  .steps li{
+    counter-increment:step; display:flex; gap:12px; padding:10px 0; font-size:.88rem; color:#dbe4f2; line-height:1.5;
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  .steps li:first-child{border-top:0;}
+  .steps li::before{
+    content:counter(step); flex:0 0 auto; width:24px; height:24px; border-radius:50%;
+    background:var(--gold); color:var(--navy); font-weight:800; font-size:.78rem;
+    display:flex; align-items:center; justify-content:center; margin-top:1px;
+  }
+  .steps b{color:#fff;}
+  .steps i.bi{color:var(--gold-light);}
+  .note-box{
+    margin-top:14px; padding:12px 14px; border-radius:10px; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.1); font-size:.82rem; color:#c6d1e6;
+  }
+
+  .fallback-link{
+    display:block; text-align:center; margin-top:22px; font-size:.82rem; color:#9fb0cc; text-decoration:underline;
+  }
+  footer{margin-top:28px; font-size:.72rem; color:#7d8bab; text-align:center;}
+</style>
+</head>
+<body>
+  <div class="wrap center">
+    <div class="mark">OKV</div>
+    <div class="eyebrow">Cloud-Synced · Works Offline Too</div>
+    <h1>Install to Get Started</h1>
+    <p class="lede">Your Admin has invited you to the OKV Payroll &amp; HR system. Install this app to your device, then log in with the username and password your Admin gave you.</p>
+
+    <div class="install-icon"><i class="bi bi-download"></i></div>
+    <div id="detectedBadge" class="detected-badge" style="display:none;"><i class="bi bi-check-circle-fill"></i><span id="detectedLabel"></span></div>
+
+    <button class="btn btn-primary" id="installBtn"><i class="bi bi-download"></i> Install Now</button>
+    <div class="status-line" id="statusLine"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="device-tabs" id="deviceTabs">
+      <button class="device-tab" data-device="android">Android</button>
+      <button class="device-tab" data-device="ios">iPhone / iPad</button>
+      <button class="device-tab" data-device="desktop-chrome">Windows / Chrome / Edge</button>
+      <button class="device-tab" data-device="desktop-mac">Mac (Safari)</button>
+    </div>
+
+    <div class="instructions-card" id="androidCard">
+      <h3><i class="bi bi-phone"></i> Android (Chrome, Edge, Samsung Internet)</h3>
+      <div class="sub">One tap in most cases.</div>
+      <ol class="steps">
+        <li>Tap the gold <b>Install Now</b> button above.</li>
+        <li>Confirm by tapping <b>Install</b> in the popup that appears.</li>
+        <li>The app opens automatically and its icon is added to your Home Screen — launch it from there anytime. You'll need internet to log in the first time; after that, it keeps working offline and syncs when you're back online.</li>
+      </ol>
+      <div class="note-box"><i class="bi bi-info-circle me-1"></i> If nothing happens when you tap Install Now, open your browser's <b>⋮ menu</b> and choose <b>"Install app"</b> or <b>"Add to Home screen"</b>.</div>
+    </div>
+
+    <div class="instructions-card" id="iosCard" style="display:none;">
+      <h3><i class="bi bi-phone"></i> iPhone / iPad (Safari)</h3>
+      <div class="sub">iOS requires Safari — this must be added manually, Apple doesn't allow one-tap install.</div>
+      <ol class="steps">
+        <li>Open this page in <b>Safari</b> (not Chrome or another browser — iOS only allows installing from Safari).</li>
+        <li>Tap the <b>Share</b> icon <i class="bi bi-box-arrow-up"></i> in the toolbar (bottom of screen on iPhone, top on iPad).</li>
+        <li>Scroll down and tap <b>"Add to Home Screen."</b></li>
+        <li>Tap <b>Add</b> in the top-right corner.</li>
+        <li>The app icon appears on your Home Screen — open it from there, then log in with the details your Admin gave you.</li>
+      </ol>
+      <div class="note-box"><i class="bi bi-info-circle me-1"></i> Opened this in Chrome or another app on iPhone? Copy the link into Safari first, since only Safari can add it to your Home Screen.</div>
+    </div>
+
+    <div class="instructions-card" id="desktop-chromeCard" style="display:none;">
+      <h3><i class="bi bi-windows"></i> Windows / Chrome / Edge</h3>
+      <div class="sub">Installs as a standalone desktop app.</div>
+      <ol class="steps">
+        <li>Click the gold <b>Install Now</b> button above, then click <b>Install</b> in the popup.</li>
+        <li>If the button doesn't respond, look for an <b>install icon</b> <i class="bi bi-plus-square"></i> at the right edge of the address bar and click it.</li>
+        <li>The app opens in its own window and adds a shortcut to your Start Menu / Desktop.</li>
+      </ol>
+      <div class="note-box"><i class="bi bi-info-circle me-1"></i> Firefox on desktop doesn't support app installs — use Chrome or Edge, or continue in the browser without installing.</div>
+    </div>
+
+    <div class="instructions-card" id="desktop-macCard" style="display:none;">
+      <h3><i class="bi bi-apple"></i> Mac (Safari)</h3>
+      <div class="sub">macOS Sonoma (14) and newer.</div>
+      <ol class="steps">
+        <li>Open this page in <b>Safari</b>.</li>
+        <li>From the menu bar choose <b>File → Add to Dock…</b> (or tap the Share icon and choose "Add to Dock").</li>
+        <li>Confirm the name and click <b>Add</b>.</li>
+        <li>The app opens in its own window and stays in your Dock — launch it anytime and log in with the details your Admin gave you.</li>
+      </ol>
+      <div class="note-box"><i class="bi bi-info-circle me-1"></i> On an older macOS without "Add to Dock," use Chrome or Edge on Mac instead — the gold Install Now button will work there.</div>
+    </div>
+
+    <a class="fallback-link" href="index.html">My browser can't install apps — continue to login →</a>
+    <footer>OKV Technology Consults &middot; technologyokv@gmail.com &middot; +2348104141138 &middot; www.okvtechnology.com</footer>
+  </div>
+
+<script>
+  // Register the service worker immediately so the app shell + CDN
+  // libraries are cached the moment this page loads.
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed', err));
+  }
+
+  const installBtn = document.getElementById('installBtn');
+  const statusLine = document.getElementById('statusLine');
+  const detectedBadge = document.getElementById('detectedBadge');
+  const detectedLabel = document.getElementById('detectedLabel');
+  const tabs = document.querySelectorAll('.device-tab');
+  const cards = { android: 'androidCard', ios: 'iosCard', 'desktop-chrome': 'desktop-chromeCard', 'desktop-mac': 'desktop-macCard' };
+  let deferredPrompt = null;
+
+  const ua = navigator.userAgent;
+  const isIOS = /iphone|ipad|ipod/i.test(ua) && !window.MSStream;
+  const isAndroid = /android/i.test(ua);
+  const isMac = /Macintosh/i.test(ua) && !isIOS;
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+  // Already installed and launched as an app? This page has nothing more to do — go straight in.
+  if(isStandalone){
+    window.location.replace('index.html');
+  }
+
+  function showDevice(key){
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.device === key));
+    Object.values(cards).forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById(cards[key]).style.display = 'block';
+  }
+  tabs.forEach(t => t.addEventListener('click', () => showDevice(t.dataset.device)));
+
+  let detectedKey = 'desktop-chrome';
+  let detectedText = 'Detected: Windows / Desktop browser';
+  if(isAndroid){ detectedKey = 'android'; detectedText = 'Detected: Android device'; }
+  else if(isIOS){ detectedKey = 'ios'; detectedText = 'Detected: iPhone / iPad'; }
+  else if(isMac){ detectedKey = 'desktop-mac'; detectedText = 'Detected: Mac'; }
+  showDevice(detectedKey);
+  detectedLabel.textContent = detectedText;
+  detectedBadge.style.display = 'inline-flex';
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    statusLine.textContent = '';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if(choice.outcome === 'accepted'){
+        statusLine.textContent = 'Installed — opening the login screen…';
+      } else {
+        statusLine.textContent = 'Installation cancelled. You can try again anytime.';
+      }
+    } else if(isIOS){
+      statusLine.textContent = isSafari
+        ? 'Use the Share icon below to add this to your Home Screen.'
+        : 'Open this page in Safari to install on iPhone/iPad.';
+      showDevice('ios');
+      document.getElementById('iosCard').scrollIntoView({behavior:'smooth', block:'start'});
+    } else if(isMac && isSafari){
+      statusLine.textContent = 'Use File → Add to Dock in Safari\'s menu bar.';
+      showDevice('desktop-mac');
+      document.getElementById('desktop-macCard').scrollIntoView({behavior:'smooth', block:'start'});
+    } else {
+      statusLine.textContent = 'One-tap install isn\'t available in this browser — follow the steps below.';
+      document.getElementById('deviceTabs').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  });
+
+  // Once the browser reports a successful install, move straight into the app.
+  window.addEventListener('appinstalled', () => {
+    statusLine.textContent = 'Installed — opening the login screen…';
+    setTimeout(() => { window.location.href = 'index.html'; }, 900);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — OKV Nigeria Payroll &amp; HR Management System</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B1F3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OKV Payroll">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root{ --navy:#0B1F3A; --navy2:#122C52; --navy3:#1B3A6B; --gold:#C9A24B; --gold-light:#E7CE8F; --gold-dark:#A9832E;
+    --font-display:'Sora',Arial,sans-serif; --font-body:'Inter',Arial,sans-serif; }
+  *{box-sizing:border-box;}
+  body{ margin:0; min-height:100vh; font-family:var(--font-body); color:#fff;
+    background:radial-gradient(1200px 700px at 15% -10%, var(--navy3) 0%, var(--navy2) 45%, var(--navy) 100%);
+    display:flex; flex-direction:column; }
+  .page-wrap{ flex:1 0 auto; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .card{max-width:420px; width:100%;}
+  .mark{ width:52px; height:52px; border-radius:14px; margin-bottom:16px;
+    background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:var(--navy);
+    font-family:var(--font-display); font-weight:800; font-size:.95rem;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(0,0,0,.32); }
+  h1{ font-family:var(--font-display); font-weight:800; font-size:1.4rem; margin:0 0 6px; }
+  p.lede{ color:#c6d1e6; font-size:.86rem; margin:0 0 18px; }
+
+  .install-banner{
+    display:flex; align-items:center; gap:10px; background:rgba(201,162,75,.12);
+    border:1px solid rgba(201,162,75,.35); border-radius:12px; padding:12px 14px; margin-bottom:20px; cursor:pointer;
+  }
+  .install-banner i.bi-download{ font-size:1.2rem; color:var(--gold-light); }
+  .install-banner .txt{ flex:1; font-size:.82rem; color:#f0e6cc; }
+  .install-banner .txt b{ display:block; font-size:.85rem; color:#fff; }
+  .install-banner .go{ font-size:.78rem; font-weight:700; color:var(--navy); background:var(--gold); padding:6px 12px; border-radius:8px; white-space:nowrap; }
+  #iosNote{
+    display:none; margin-bottom:20px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.1); font-size:.82rem; color:#c6d1e6;
+  }
+
+  .offline-banner{
+    display:none; align-items:center; gap:10px; background:rgba(220,53,69,.15);
+    border:1px solid rgba(220,53,69,.4); border-radius:12px; padding:12px 14px; margin-bottom:18px; font-size:.85rem; color:#ffb3bd;
+  }
+
+  label{ font-size:.8rem; color:#c6d1e6; font-weight:600; margin-bottom:4px; display:block; }
+  input{ width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.06); color:#fff; font-size:.92rem; margin-bottom:14px; font-family:var(--font-body); }
+  input:focus{ outline:none; border-color:var(--gold); }
+  .pw-field{ position:relative; }
+  .pw-field input{ padding-right:44px; }
+  .pw-toggle{ position:absolute; right:6px; top:0; bottom:14px; width:32px; background:none; border:0; color:#9fb0cc;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+  .pw-toggle:hover{ color:#fff; }
+  .btn{ width:100%; font-weight:700; font-size:.95rem; border:0; border-radius:10px; padding:14px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .btn-primary{ background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:var(--navy); }
+  .btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
+  .row-between{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:.82rem; }
+  .row-between a, .row-between button{ color:#9fb0cc; background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; font-size:.82rem; font-family:var(--font-body); }
+  .msg{ margin-top:14px; font-size:.85rem; padding:12px 14px; border-radius:10px; display:none; }
+  .msg.error{ background:rgba(220,53,69,.15); border:1px solid rgba(220,53,69,.4); color:#ffb3bd; display:block; }
+  .msg.success{ background:rgba(40,167,69,.15); border:1px solid rgba(40,167,69,.4); color:#a8e6b0; display:block; }
+  .foot-link{ text-align:center; margin-top:18px; font-size:.85rem; color:#9fb0cc; }
+  .foot-link a{ color:var(--gold-light); text-decoration:none; font-weight:600; }
+
+  .site-footer{ flex-shrink:0; text-align:center; padding:18px 24px 24px; font-size:.8rem; color:#9fb0cc; opacity:.75; }
+  .site-footer a{ color:#9fb0cc; text-decoration:none; }
+
+  /* Forgot-password mini modal */
+  #forgotOverlay{ position:fixed; inset:0; background:rgba(6,14,28,.75); display:none; align-items:center; justify-content:center; z-index:999; padding:20px; }
+  #forgotOverlay.show{ display:flex; }
+  #forgotBox{ max-width:380px; width:100%; background:#0F2545; border:1px solid rgba(201,162,75,.35); border-radius:16px; padding:22px; }
+  #forgotBox h3{ font-family:var(--font-display); font-size:1.05rem; margin:0 0 6px; }
+  #forgotBox p{ color:#c6d1e6; font-size:.82rem; margin:0 0 14px; }
+</style>
+</head>
+<body>
+  <div class="page-wrap">
+  <div class="card">
+    <div class="mark brand-logo-mark">OKV</div>
+    <h1>Log In</h1>
+    <p class="lede">OKV Nigeria Payroll &amp; HR Management System — Online</p>
+
+    <div class="install-banner" id="installBanner">
+      <i class="bi bi-download"></i>
+      <div class="txt"><b>Install this app</b>Faster access from your Home Screen</div>
+      <span class="go">Install</span>
+    </div>
+    <div id="iosNote"><i class="bi bi-info-circle me-1"></i> <b>On iPhone/iPad:</b> tap the Share icon <i class="bi bi-box-arrow-up"></i>, then "Add to Home Screen."</div>
+
+    <div class="offline-banner" id="offlineBanner"><i class="bi bi-wifi-off"></i> You're offline — reconnect to log in.</div>
+
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Your username" required>
+      <label for="password">Password</label>
+      <div class="pw-field">
+        <input type="password" id="password" placeholder="Your password" required>
+        <button type="button" class="pw-toggle" onclick="togglePasswordField(this)" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button>
+      </div>
+      <button type="submit" class="btn btn-primary" id="loginBtn"><i class="bi bi-box-arrow-in-right"></i> Log In</button>
+      <div class="row-between">
+        <button type="button" id="forgotLink">Forgot password?</button>
+        <span></span>
+      </div>
+    </form>
+    <div class="msg" id="formMsg"></div>
+
+    <div class="foot-link">Setting up your organization for the first time? <a href="../signup.html">Create Admin Account</a></div>
+  </div>
+  </div>
+
+  <footer class="site-footer">
+    technologyokv@gmail.com &middot; +2348104141138 &middot; www.okvtechnology.com<br>
+    <a href="../privacy-policy.html">Privacy Policy</a> &middot; <a href="../terms-of-service.html">Terms of Service</a>
+  </footer>
+
+  <div id="forgotOverlay">
+    <div id="forgotBox">
+      <h3><i class="bi bi-envelope me-1"></i>Reset Admin Password</h3>
+      <p>Enter the email your Admin account was registered with. We'll send a reset link — this only works for Admin accounts; Users should ask their Admin to reset their password.</p>
+      <label for="forgotEmail">Email</label>
+      <input type="email" id="forgotEmail" placeholder="you@company.com">
+      <button class="btn btn-primary" id="forgotSubmit" style="margin-top:6px;"><i class="bi bi-send"></i> Send Reset Link</button>
+      <div class="msg" id="forgotMsg"></div>
+      <div class="row-between" style="justify-content:center; margin-top:14px;"><button type="button" id="forgotCancel">Cancel</button></div>
+    </div>
+  </div>
+
+<script src="config.js"></script>
+<script src="okv-auth.js"></script>
+<script>
+  applyBranding();
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed', err));
+  }
+
+  /* If a valid session already exists, skip straight to the right dashboard —
+     this also lets a previously-logged-in user open the app offline. */
+  const existingSuperAdmin = getSuperAdminSession();
+  if(existingSuperAdmin && existingSuperAdmin.sessionToken){
+    window.location.replace('superadmin.html');
+  }
+  const existing = getSession();
+  if(existing && existing.sessionToken){
+    window.location.replace('app.html');
+  }
+
+  /* ---- Install prompt ---- */
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  let deferredPrompt = null;
+  const installBanner = document.getElementById('installBanner');
+  const iosNote = document.getElementById('iosNote');
+
+  if(isStandalone){
+    installBanner.style.display = 'none';
+  } else if(isIOS){
+    installBanner.style.display = 'none';
+    iosNote.style.display = 'block';
+  }
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+  installBanner.addEventListener('click', async () => {
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  });
+
+  /* ---- Offline handling ---- */
+  const offlineBanner = document.getElementById('offlineBanner');
+  const loginBtn = document.getElementById('loginBtn');
+  function refreshOnlineState(){
+    const online = navigator.onLine;
+    offlineBanner.style.display = online ? 'none' : 'flex';
+    loginBtn.disabled = !online;
+  }
+  window.addEventListener('online', refreshOnlineState);
+  window.addEventListener('offline', refreshOnlineState);
+  refreshOnlineState();
+
+  /* ---- Login ---- */
+  const form = document.getElementById('loginForm');
+  const msg = document.getElementById('formMsg');
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    msg.className = 'msg'; msg.textContent = '';
+    if(!navigator.onLine){
+      msg.className = 'msg error'; msg.textContent = "You're offline — reconnect to log in.";
+      return;
+    }
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    loginBtn.disabled = true; loginBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Logging in…';
+    try{
+      const passwordHash = await sha256Hex(password);
+      const data = await apiCall('login', {username, passwordHash});
+      if(data.user && data.user.isSuperAdmin){
+        saveSuperAdminSession(data.user, data.sessionToken);
+        window.location.href = 'superadmin.html';
+      } else {
+        saveSession(data.user, data.sessionToken);
+        window.location.href = 'app.html';
+      }
+    }catch(err){
+      msg.className = 'msg error'; msg.textContent = err.message;
+      loginBtn.disabled = false; loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Log In';
+    }
+  });
+
+  /* ---- Forgot password ---- */
+  const forgotOverlay = document.getElementById('forgotOverlay');
+  const forgotMsg = document.getElementById('forgotMsg');
+  document.getElementById('forgotLink').addEventListener('click', () => { forgotOverlay.classList.add('show'); forgotMsg.className='msg'; forgotMsg.textContent=''; });
+  document.getElementById('forgotCancel').addEventListener('click', () => forgotOverlay.classList.remove('show'));
+  document.getElementById('forgotSubmit').addEventListener('click', async () => {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if(!email){ forgotMsg.className='msg error'; forgotMsg.textContent='Enter your email.'; return; }
+    if(!navigator.onLine){ forgotMsg.className='msg error'; forgotMsg.textContent="You're offline — reconnect to request a reset link."; return; }
+    try{
+      const resetBaseUrl = new URL('reset-password.html', window.location.href).href;
+      const data = await apiCall('forgotPassword', {username: email, resetBaseUrl});
+      forgotMsg.className = 'msg success'; forgotMsg.textContent = data.message;
+    }catch(err){
+      forgotMsg.className = 'msg error'; forgotMsg.textContent = err.message;
+    }
+  });
+</script>
+</body>
+</html>
