@@ -11,5 +11,5 @@
    3. Upload the whole folder to your static host. No other file needs editing.
    ========================================================================== */
 window.OKV_CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbwpVH9vTASOP-qa2JHmfygToiCHf4tOlYzBaMr_d6xmCdDYDxcQp3h7H5YKDENbwIeC/exec'
 };
